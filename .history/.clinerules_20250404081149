@@ -1,4 +1,3 @@
-
 The terminal is bash (even though it may say something else somewhere in my enviorment details or somewhere...)
 
 # Terminal Output
@@ -20,39 +19,3 @@ One thing about the paths:
 I have a folder named underscore in C:\ and all my files are in there so all my full paths starts with C:\_\
 The folder name is something I will eventually get around to changing. But until I do, I need you to know about it because Large language models sometimes get the path wrong.
 The python code should simply be written to work cross platform anyway so this should not really be a problem...
-
-
----
-
-TASK IS:
-
-@/task_1743740101_PROBLEM_SUMMARY_Path_of_Exile_2_Early_Acc.md 
-
-@/task_1743740118_PROBLEM_SUMMARY_Path_of_Exile_2_Early_Acc.md 
-
-@/task_1743740241_PROBLEM_SUMMARY_Path_of_Exile_2_Early_Acc.md 
-
-I am going to send this repo to my friend just to give him the 3 files with the path of exile 2 information.
-
-Read all of them and use all the information to create ONE giant file that contains ALL the information from all 3 files, name it something logical and make it pretty and presentable and easy to understand for any player (he is not a developer)
-
-Still make it in markdown.
-
-Actually, you should save it to README.md so it is there on github front page...
-
-I will take care of git actions and pushing to github.
-
-
-REMEMBER THAT EVERYTHING FROM ALL THE 3 FILES SHOULD BE PROBERLY COMBINED AS IF IT WAS ONLY ONE BIGGER FILE WITH ALL THE INFORMATION FROM ALL THE 3 FILES!!!
-
-TRY UNTIL YOU SUCCEED!!
-
-AND THEN IMPROVE IT!!
-
-AND THEN IMPROVE IT MOREE!!!
-
-AND CONTINUE UNTIL ALL INFORMATION IS IN THE FILE AND IT LOOKS LIKE ONE GIANT GUIDE INSTEAD OF 3 SEPERATE ONES!!!
-
-DO NOT FINNISH UNTIL ALL THOSE CRITERIA IS PROPERLY MET!!!
-
-YOU HAVE TO MAKE THE GUIDE AS SIMPLE TO FOLLOW AS POSSIBLE FOR SOMEONE WHO IS NOT TECHNOCAL!

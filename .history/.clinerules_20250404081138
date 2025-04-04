@@ -1,0 +1,21 @@
+The terminal is bash (even though it may say something else somewhere in my enviorment details or somewhere...)
+
+# Terminal Output
+
+If the assistant doesen't see a command's output, it usually means the terminal was starting up - the command still ran successfully and the user can see the output. All subsequent commands in that terminal will be visible to the assistant.
+
+The startup problem was often caused by conda and I usually don't use conda anymore... Also the problem has been adressed in recent updates so maybe it's fixed.
+
+If this happens twice in a row, your bash terminal settings migpreadht need checking. The setting that is tested and works for the assistant to see terminal output is:
+`"terminal.integrated.defaultProfile.windows": "Git Bash"`
+
+Since the user can always see the terminal output, Cline will only ask for output confirmation if:
+1. The output is critical for the next step AND
+2. There's no other way to verify the result (like using another command)
+
+If it happens twice in a row, try to experiment a little with what will actually show you the output. I still am not sure about what causes it and it seems inconsistant, but once it works it usually continues to keep working.
+
+One thing about the paths:
+I have a folder named underscore in C:\ and all my files are in there so all my full paths starts with C:\_\
+The folder name is something I will eventually get around to changing. But until I do, I need you to know about it because Large language models sometimes get the path wrong.
+The python code should simply be written to work cross platform anyway so this should not really be a problem...
