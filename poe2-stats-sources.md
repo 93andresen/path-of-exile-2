@@ -684,3 +684,84 @@ So the corrected ceiling: **composition and numbers are both automatable** — c
 - `r/PathOfExile2` — PoB2 character import requires OAuth; no website access to PoE2 characters
 - GGG developer docs (already cited in Part 1) — public vs confidential clients, local-redirect rule, 10h/7d lifetimes, `service:*` restriction
 - poe.ninja (already cited) — Build Planner export availability, and the builds/character API refusal that makes the owner-or-ninja rule unavoidable
+
+## 21. Gap closures, same day — read out of PoB2's own source
+
+Four of the six gaps in §19 are now closed, three of them by reading `PathOfBuildingCommunity/PathOfBuilding-PoE2` (branch `dev`) directly rather than by inference. Two remain open.
+
+### Closed: PoE2 **does** ship the headless wrapper **[verified: file present, 2,494 bytes]**
+
+`src/HeadlessWrapper.lua` exists in the PoE2 repo and opens with:
+
+> `-- This wrapper allows the program to run headless on any OS (in theory)` / `-- It can be run using a standard lua interpreter, although LuaJIT is preferable`
+
+It `dofile`s `_SimpleGraphic.def.lua` and `Launch.lua`, stubs the graphics API, runs `OnInit` + one `OnFrame`, then exposes the build module:
+
+```lua
+build = __mainObject__.main.modes["BUILD"]
+```
+
+and three helpers:
+
+```lua
+newBuild()
+loadBuildFromXML(xmlText, name)
+loadBuildFromJSON(characterJSON)
+```
+
+So the PoE1 pattern that `pob-mcp` relies on is present in PoE2 in the same shape. §17's "probably, test it" becomes "the mechanism ships; I have not executed it here" — the remaining risk is the interpreter (LuaJIT ≥ mid-2026 for compound assignment) and native modules, not the wrapper.
+
+### Closed, and this is the important one: the API JSON feeds the engine directly **[verified: comment in PoB2's own source]**
+
+`loadBuildFromJSON` is documented in-source as taking exactly the object this file's Part 1 describes:
+
+```lua
+-- characterJSON could, for example, be the response from the PoE API:
+-- https://www.pathofexile.com/developer/docs/reference#characters-get
+local dkjson = require "dkjson"
+local input = dkjson.decode(characterJSON)
+local charData = build.importTab:ImportItemsAndSkills(input)
+build.importTab:ImportPassiveTreeAndJewels(input)
+```
+
+That closes the loop Part 1 said could not be closed. The chain is now end to end, **with no GUI anywhere**:
+
+```
+PKCE OAuth -> GET /character/{name}?realm=poe2  ->  character JSON
+            -> loadBuildFromJSON(json)          ->  PoB2 engine, headless
+            -> read build.calcsTab              ->  computed stats as text
+```
+
+with the caveat the source prints itself: *"You now have a build without a correct main skill selected, or any configuration options set"* — so a headless run must set the main skill and the config flags (boss mode, charges, buffs) before the numbers mean anything. That is the real work in automating it, not the data fetch.
+
+### Closed: where PoB2 keeps builds **[verified: `src/Modules/Main.lua`]**
+
+```lua
+self.defaultBuildPath = self.userPath.."Builds/"
+```
+
+`userPath` comes from `GetUserPath()` plus `/Path of Building (PoE2)/`, i.e. by default **`Documents\Path of Building (PoE2)\Builds\`**, overridable in Settings (`buildPath`, written to `Documents\Path of Building (PoE2)\Settings.xml`). So §14 step 5 is confirmed for PoE2, not just PoB1.
+
+### Closed: `.build` cannot carry items — by design, not by prototype **[documented]**
+
+The GGG schema in Part 1 already said it: a `Build` has `name`, `author`, `link`, `description`, `ascendancy`, `passives`, `skills`, `inventory_slots` — and the only field on `BuildInventorySlot` is `inventory_id` plus `additional_text`. There is **no item data field in the format at all**. So "items not included yet" is not a prototype shortfall that will be fixed; the format is a plan, not a recording. Correct reading: `.build` is a build *instruction*, a PoB XML or share code is a build *recording*.
+
+### Still open: whether poe.ninja's PoE2 pages render computed numbers
+
+Unchanged from §19. Their pages are client-rendered and my one browser attempt was cut short; their builds API is closed, so there is no supported way to check programmatically.
+
+### Newly blocked: PoE2 profile pages cannot be probed anonymously **[verified]**
+
+`pathofexile.com/account/view-profile/<account>/characters` returns a **Cloudflare interstitial** ("Just a moment…") to a plain curl, for both `Name#1234` and `Name-1234` spellings — so whether a PoE2 public profile renders items cannot be established by HTTP alone. It is not evidence that the page does not exist, only that a bot cannot see it. A real browser is the only way to settle it.
+
+### Still open: the `account:characters` rate limit
+
+Undocumented, unmeasured (needs a token), unchanged.
+
+## 22. Sources for §21
+
+- `raw.githubusercontent.com/PathOfBuildingCommunity/PathOfBuilding-PoE2/dev/src/HeadlessWrapper.lua` — headless wrapper, `loadBuildFromXML`, `loadBuildFromJSON`, the API-response comment
+- `…/dev/src/Modules/Main.lua` — `userPath` construction (`/Path of Building (PoE2)/`), `defaultBuildPath = userPath.."Builds/"`, `Settings.xml`
+- `…/dev/src/Modules/Build.lua`, `…/dev/src/Modules/CalcSetup.lua`, `…/dev/src/LaunchServer.lua` — present, same layout as PoB1 (200/116,098 / 114,094 / 6,643 bytes)
+- GGG developer docs, Build Planner schema (already cited) — the absence of any item field
+- Live probe, 2026-11-17 — Cloudflare interstitial on `view-profile/.../characters`
